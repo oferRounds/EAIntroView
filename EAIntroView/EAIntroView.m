@@ -80,6 +80,13 @@
     self.pages = [pagesArray copy];
     
     [self buildFooterView];
+    
+    // Add observer for device orientation:
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(deviceOrientationDidChange:)
+                                                 name:UIDeviceOrientationDidChangeNotification
+                                               object:nil];
 }
 
 - (void)applyDefaultsToBackgroundImageView:(UIImageView *)backgroundImageView {
@@ -161,6 +168,10 @@
 }
 
 - (void)finishIntroductionAndRemoveSelf {
+	// Remove observer for rotation
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    
     //prevent last page flicker on disappearing
     self.alpha = 0;
     
@@ -177,8 +188,14 @@
 }
 
 - (void)skipIntroduction {
-	self.skipped = YES;
-    [self hideWithFadeOutDuration:0.3];
+    if (self.loginWhenSkipTapped) {
+        if ([(id)self.delegate respondsToSelector:@selector(introDid:didTapLoginButton:)]) {
+            [self.delegate introDid:self didTapLoginButton:self.skipButton];
+        }
+    } else {
+        self.skipped = YES;
+        [self hideWithFadeOutDuration:0.3];
+    }
 }
 
 - (void)notifyDelegateWithPreviousPage:(NSUInteger)previousPageIndex andCurrentPage:(NSUInteger)currentPageIndex {
@@ -191,22 +208,6 @@
         if ([(id)self.delegate respondsToSelector:@selector(intro:pageAppeared:withIndex:)]) {
             [self.delegate intro:self pageAppeared:_pages[currentPageIndex] withIndex:currentPageIndex];
         }
-    }
-}
-
--(void)willMoveToSuperview:(UIView *)newSuperview {
-    [super willMoveToSuperview:newSuperview];
-    if (self.superview == nil && newSuperview != nil) {
-        // Add observer for device orientation:
-        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(deviceOrientationDidChange:)
-                                                     name:UIDeviceOrientationDidChangeNotification
-                                                   object:nil];
-    } else if (self.superview != nil && newSuperview == nil) {
-        // Remove observer for rotation
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
-        [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     }
 }
 

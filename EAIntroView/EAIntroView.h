@@ -29,6 +29,7 @@ typedef NS_ENUM(NSUInteger, EAViewAlignment) {
 - (void)intro:(EAIntroView *)introView pageAppeared:(EAIntroPage *)page withIndex:(NSUInteger)pageIndex;
 - (void)intro:(EAIntroView *)introView pageStartScrolling:(EAIntroPage *)page withIndex:(NSUInteger)pageIndex;
 - (void)intro:(EAIntroView *)introView pageEndScrolling:(EAIntroPage *)page withIndex:(NSUInteger)pageIndex;
+- (void)introDid:(EAIntroView *)introView didTapLoginButton:(UIButton *)loginButton;
 @end
 
 @interface EAIntroView : UIView <UIScrollViewDelegate>
@@ -40,7 +41,9 @@ typedef NS_ENUM(NSUInteger, EAViewAlignment) {
 @property (nonatomic, assign) BOOL hideOffscreenPages;
 @property (nonatomic, assign) BOOL easeOutCrossDisolves;
 @property (nonatomic, assign) BOOL useMotionEffects;
+@property (nonatomic, assign) BOOL loginWhenSkipTapped;
 @property (nonatomic, assign) CGFloat motionEffectsRelativeValue;
+
 
 // Title View (Y position - from top of the screen)
 @property (nonatomic, strong) UIView *titleView;
